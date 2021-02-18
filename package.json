@@ -2,6 +2,10 @@
   "name": "academy-server",
   "version": "1.0.0",
   "description": "在线学堂小程序后端",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Reki-code/academy-server.git"
+  },
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
