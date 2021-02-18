@@ -1,0 +1,15 @@
+{
+  "name": "academy-server",
+  "version": "1.0.0",
+  "description": "在线学堂小程序后端",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rekii",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server": "^2.21.0",
+    "graphql": "^15.5.0"
+  }
+}
