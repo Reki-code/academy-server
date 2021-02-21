@@ -13,7 +13,7 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true 
 
 // setup apollo server
 const User = require('./model/user')
-const { ApolloServer, UserInputError } = require('apollo-server-express')
+const { ApolloServer } = require('apollo-server-express')
 const schema = require('./graphql/schema')
 const server = new ApolloServer({
   schema,
