@@ -35,12 +35,7 @@ const resolvers = {
         id: args.id
       }
     },
-    me: () => {
-      return {
-        username: 'Root',
-        id: '0'
-      }
-    }
+    me: (parent, args, { currentUser }) => currentUser
   },
   Mutation: {
     createUser: async (root, args) => {

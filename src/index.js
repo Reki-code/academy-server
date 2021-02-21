@@ -12,10 +12,18 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true 
   .catch((error) => console.erroe('error connection to MongoDB', error.message))
 
 // setup apollo server
-const { ApolloServer } = require('apollo-server-express')
+const User = require('./model/user')
+const { ApolloServer, UserInputError } = require('apollo-server-express')
 const schema = require('./graphql/schema')
 const server = new ApolloServer({
-  schema
+  schema,
+  context: async ({ req }) => {
+    const username = req ? req.headers.authorization : null
+    if (username) {
+      const currentUser = await User.findOne({ username })
+      return { currentUser }
+    }
+  }
 })
 server.applyMiddleware({ app, path: '/graphql' });
 
