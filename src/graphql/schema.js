@@ -10,6 +10,9 @@ const Query = gql`
   type Mutation {
     _: Boolean
   }
+  type Token {
+    value: String!
+  }
 `
 
 const resolvers = { }

@@ -1,5 +1,7 @@
 const { gql, UserInputError } = require('apollo-server')
 const User = require('../model/user')
+const jwt = require('jsonwebtoken')
+const JWT_SECRET = process.env.JWT_SECRET
 
 const typeDef = gql`
 type User {
@@ -22,7 +24,7 @@ type User {
     login(
       username: String!
       password: String!
-    ): User
+    ): Token
   }
 `
 
@@ -56,7 +58,14 @@ const resolvers = {
     },
     login: async (root, args) => {
       const user = await User.findOne({ username: args.username, password: args.password })
-      return user
+      if (!user) {
+        throw new UserInputError('wrong credentials')
+      }
+      const userForToken = {
+        username: user.username,
+        id: user._id
+      }
+      return { value: jwt.sign(userForToken, JWT_SECRET) }
     }
   }
 }
