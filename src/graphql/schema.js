@@ -7,6 +7,9 @@ const Query = gql`
   type Query {
     _: Boolean
   }
+  type Mutation {
+    _: Boolean
+  }
 `
 
 const resolvers = { }
