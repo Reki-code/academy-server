@@ -11,13 +11,13 @@ type User {
     password: String!
   }
   extend type Query {
-    users: [User!]
+    users(type: Type): [User!]
     user(id: ID!): User
     me: User
   }
   extend type Mutation {
     createUser(
-      type: String!
+      type: Type!
       username: String!
       password: String!
     ): User
@@ -26,17 +26,22 @@ type User {
       password: String!
     ): Token
   }
+  enum Type {
+  ADMIN
+  TEACHER
+  STUDENT
+}
 `
 
 const resolvers = {
   Query: {
-    users: () => [],
-    user: (parent, args) => {
-      return {
-        username: 'Name',
-        id: args.id
+    users: (parent, args) => {
+      if (args.type) {
+        return User.find({ type: args.type })
       }
+      return User.find({ })
     },
+    user: (parent, args) => User.findById(args.id),
     me: (parent, args, { currentUser }) => currentUser
   },
   Mutation: {
@@ -54,7 +59,6 @@ const resolvers = {
           invalidArgs: args
         })
       }
-      
     },
     login: async (root, args) => {
       const user = await User.findOne({ username: args.username, password: args.password })
