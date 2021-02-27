@@ -1,9 +1,6 @@
 const { makeExecutableSchema, gql } = require("apollo-server")
 const { mergeAll } = require('ramda')
 
-const user = require('./user')
-const wx = require('./wx')
-
 const Query = gql`
   type Query {
     _: Boolean
@@ -16,7 +13,10 @@ const Query = gql`
   }
 `
 
-const resolvers = { }
+const resolvers = {}
+
+const user = require('./user')
+const wx = require('./wx')
 
 const schema = makeExecutableSchema({
   typeDefs: [ Query, user.typeDef, wx.typeDef ],

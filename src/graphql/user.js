@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken')
 const JWT_SECRET = process.env.JWT_SECRET
 
 const typeDef = gql`
-type User {
+  type User {
     id: ID!
     type: String!
     username: String!

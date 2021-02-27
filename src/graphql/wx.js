@@ -1,13 +1,10 @@
-const { gql, UserInputError } = require('apollo-server')
+const { gql } = require('apollo-server')
 const axios = require('axios').default
 
 const typeDef = gql`
   extend type Mutation {
-    wxLogin(
-      code: String!
-    ): String
+    wxLogin(code: String!): String
   }
-}
 `
 
 const resolvers = {
