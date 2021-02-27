@@ -41,12 +41,20 @@ const typeDef = gql`
 }
 `
 
-const code2openid = async (code) => {
+const code2openid = async code => {
   const response = await axios({
     method: 'get',
     url: `https://api.weixin.qq.com/sns/jscode2session?appid=wx8349d9be7ef6554f&secret=277ad7b7bd808830761f654e8c0f5d71&js_code=${code}&grant_type=authorization_code`
   })
   return response.data.openid
+}
+
+const user2token = user => {
+  const userForToken = {
+    username: user.username,
+    id: user._id
+  }
+  return { value: jwt.sign(userForToken, JWT_SECRET) }
 }
 
 const resolvers = {
@@ -81,41 +89,28 @@ const resolvers = {
       if (!user) {
         throw new UserInputError('wrong credentials')
       }
-      const userForToken = {
-        username: user.username,
-        id: user._id
-      }
-      return { value: jwt.sign(userForToken, JWT_SECRET) }
+      return user2token(user)
     },
     wxLogin: async (root, args) => {
-      const openid = code2openid(args.code)
+      const openid = await code2openid(args.code)
 
       const user = await User.findOne({ wxId: openid })
       if (!user) {
         return null
       }
-      const userForToken = {
-        username: user.username,
-        id: user._id
-      }
-      return { value: jwt.sign(userForToken, JWT_SECRET) }
+      return user2token(user)
     },
     bindWx: async (root, args) => {
-      const openid = code2openid(args.code)
+      const openid = await code2openid(args.code)
 
       const filter = { username: args.username, password: args.password }
       const update = { wxId: openid }
-
+console.log(update)
       const user = await User.findOneAndUpdate(filter, update, { new: true })
       if (!user) {
         throw new UserInputError('wrong credentials')
       }
-
-      const userForToken = {
-        username: user.username,
-        id: user._id
-      }
-      return { value: jwt.sign(userForToken, JWT_SECRET) }
+      return user2token(user)
     }
   }
 }
