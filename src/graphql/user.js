@@ -103,11 +103,14 @@ const resolvers = {
     bindWx: async (root, args) => {
       const openid = code2openid(args.code)
 
-      const user = await User.findOne({ username: args.username, password: args.password })
+      const filter = { username: args.username, password: args.password }
+      const update = { wxId: openid }
+
+      const user = await User.findOneAndUpdate(filter, update, { new: true })
       if (!user) {
         throw new UserInputError('wrong credentials')
       }
-      user.wxId = openid
+
       const userForToken = {
         username: user.username,
         id: user._id
