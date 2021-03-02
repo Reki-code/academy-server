@@ -18,11 +18,8 @@ const typeDef = gql`
     me: User
   }
   extend type Mutation {
-    createUser(
-      type: Type!
-      username: String!
-      password: String!
-    ): User
+    createUser(input: CreateUserInput!): CreateUserPayload
+    updateUser(input: UpdateUserInput!): UpdateUserPayload
     login(
       username: String!
       password: String!
@@ -34,11 +31,27 @@ const typeDef = gql`
       code: String!
     ): Token
   }
+  input CreateUserInput {
+    type: Type!
+    username: String!
+    password: String!
+  }
+  type CreateUserPayload {
+    user: User
+  }
+  input UpdateUserInput {
+    id: ID!
+    username: String
+    password: String
+  }
+  type UpdateUserPayload {
+    user: User
+  }
   enum Type {
-  ADMIN
-  TEACHER
-  STUDENT
-}
+    ADMIN
+    TEACHER
+    STUDENT
+  }
 `
 
 const code2openid = async code => {
@@ -70,19 +83,25 @@ const resolvers = {
   },
   Mutation: {
     createUser: async (root, args) => {
+      const input = args.input
       const user = new User({
-        type: args.type,
-        username: args.username,
-        password: args.password
+        type: input.type,
+        username: input.username,
+        password: input.password
       })
       try {
         const savedUser = await user.save()
-        return savedUser
+        return { user: savedUser }
       } catch (error) {
         throw new UserInputError(error.message, {
           invalidArgs: args
         })
       }
+    },
+    updateUser: async (root, args) => {
+      const input = args.input
+      const newUser = await User.findByIdAndUpdate(input.id, input, { new: true })
+      return { user: newUser }
     },
     login: async (root, args) => {
       const user = await User.findOne({ username: args.username, password: args.password })
