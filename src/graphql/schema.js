@@ -12,14 +12,12 @@ const Query = gql`
   }
 `
 
-const resolvers = {}
-
 const user = require('./user')
 const course = require('./course')
 
 const schema = makeExecutableSchema({
   typeDefs: [ Query, user.typeDef, course.typeDef ],
-  resolvers: [resolvers, user.resolvers, course.resolvers]
+  resolvers: [ user.resolvers, course.resolvers ]
 })
 
 module.exports = schema
