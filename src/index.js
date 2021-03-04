@@ -36,3 +36,8 @@ const PORT = process.env.PORT
 app.listen({ port: PORT }, () => {
   console.log(`Apollo Server on http://localhost:${PORT}/graphql`);
 })
+
+User.findById("603324cfff395e096ca615a2")
+  .then(usr => {
+    console.log(usr)
+  })
