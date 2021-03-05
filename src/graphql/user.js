@@ -13,9 +13,12 @@ const typeDef = gql`
     wxId: String
   }
   extend type Query {
-    users(type: Type): [User!]
+    users(searchBy: UserInput!): [User!]
     user(id: ID!): User
     me: User
+  }
+  input UserInput {
+    type: Type
   }
   extend type Mutation {
     createUser(input: CreateUserInput!): CreateUserPayload
@@ -72,12 +75,7 @@ const user2token = user => {
 
 const resolvers = {
   Query: {
-    users: (parent, args) => {
-      if (args.type) {
-        return User.find({ type: args.type })
-      }
-      return User.find({ })
-    },
+    users: (parent, args) => User.find(args.searchBy),
     user: (parent, args) => User.findById(args.id),
     me: (parent, args, { currentUser }) => currentUser
   },
