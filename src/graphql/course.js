@@ -10,6 +10,7 @@ const typeDef = gql`
   }
   extend type Query {
     courses(searchBy: CourseInput!): [Course!]
+    course(id: ID!): Course
   }
   input CourseInput {
     id: ID
@@ -40,6 +41,7 @@ const typeDef = gql`
 const resolvers = {
   Query: {
     courses: (root, args) => Course.find(args.searchBy),
+    course: (root, args) => Course.findById(args.id),
   },
   Mutation: {
     createCourse: async (root, args) => {
