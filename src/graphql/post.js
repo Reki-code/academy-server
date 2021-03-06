@@ -56,14 +56,8 @@ const typeDef = gql`
 
 const resolvers = {
   Query: {
-    posts: (root, args) => Post.find(args.searchBy)
-        .populate('author')
-        .populate('answers')
-        .populate('comments.author'),
-    post: (root, args) => Post.findById(args.id)
-        .populate('author')
-        .populate('answers')
-        .populate('comments.author'),
+    posts: (root, args) => Post.find(args.searchBy),
+    post: (root, args) => Post.findById(args.id),
   },
   Mutation: {
     createPost: async (root, args) => {
@@ -89,9 +83,16 @@ const resolvers = {
       return { post: newPost }
     }
   },
+  Post: {
+    author: (parent) => User.findById(parent.author),
+    answers: (parent) => Post.find({ '_id': { $in: parent.answers }})
+  },
   Vote: {
     voterId: (parent) => parent.voter,
     voter: (parent) => User.findById(parent.voter)
+  },
+  Comment: {
+    author: (parent) => User.findById(parent.author)
   }
 }
 
