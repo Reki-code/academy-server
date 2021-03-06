@@ -1,12 +1,14 @@
 const { gql, UserInputError } = require('apollo-server')
 const Course = require('../model/course')
 const User = require('../model/user')
+const Post = require('../model/post')
 
 const typeDef = gql`
   type Course {
     id: ID!
     title: String!
     teacher: User!
+    questions: [Post!]
   }
   extend type Query {
     courses(searchBy: CourseInput!): [Course!]
@@ -20,6 +22,7 @@ const typeDef = gql`
   extend type Mutation {
     createCourse(input: CreateCourseInput!): CreateCoursePayload
     updateCourse(input: UpdateCourseInput!): UpdateCoursePayload
+    courseAddQuestion(input: CourseAddQuestionInput!): CourseAddQuestionPayload
   }
   input CreateCourseInput {
     title: String!
@@ -34,6 +37,13 @@ const typeDef = gql`
     teacherId: String
   }
   type UpdateCoursePayload {
+    course: Course
+  }
+  input CourseAddQuestionInput {
+    courseId: String!
+    questionId: String
+  }
+  type CourseAddQuestionPayload {
     course: Course
   }
 `
@@ -64,10 +74,19 @@ const resolvers = {
       const newCourse = await Course
         .findByIdAndUpdate(input.id, input, { new: true })
       return { course: newCourse }
+    },
+    courseAddQuestion: async (root, args) => {
+      const input = args.input
+      const newCourse = await Course.findByIdAndUpdate(
+        input.courseId,
+        { $push: { questions: input.questionId } },
+        { new: true })
+      return { course: newCourse }
     }
   },
   Course: {
     teacher: (parent) => User.findById(parent.teacher),
+    questions: (parent) => Post.find({ '_id': { $in: parent.questions } }),
   }
 }
 

@@ -9,7 +9,11 @@ const schema = new Schema({
   teacher: {
     type: Schema.Types.ObjectId,
     ref: 'User'
-  }
+  },
+  questions: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Post'
+  }]
 })
 
 module.exports = mongoose.model('Course', schema)
