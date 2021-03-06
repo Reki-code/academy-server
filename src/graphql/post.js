@@ -35,6 +35,7 @@ const typeDef = gql`
   extend type Mutation {
     createPost(input: CreatePostInput!): CreatePostPayload
     updatePost(input: UpdatePostInput!): UpdatePOstPayload
+    postAddComment(input: PostAddCommentInput!): PostAddCommentPayload
   }
   input CreatePostInput {
     title: String
@@ -50,6 +51,14 @@ const typeDef = gql`
     title: String
   }
   type UpdatePOstPayload {
+    post: Post
+  }
+  input PostAddCommentInput {
+    postId: String!
+    comment: String
+    author: String
+  }
+  type PostAddCommentPayload {
     post: Post
   }
 `
@@ -80,6 +89,19 @@ const resolvers = {
       const input = args.input
       const newPost = await Course
         .findByIdAndUpdate(input.id, input, { new: true })
+      return { post: newPost }
+    },
+    postAddComment: async (root, args) => {
+      const input = args.input
+      const comment = {
+        author: input.author,
+        content: input.comment
+      }
+      const newPost = await Post.findByIdAndUpdate(
+        input.postId,
+        { $push: { comments: comment } },
+        { new: true }
+      )
       return { post: newPost }
     }
   },
