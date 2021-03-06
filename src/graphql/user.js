@@ -1,6 +1,7 @@
 const { gql, UserInputError } = require('apollo-server')
 const axios = require('axios').default
 const User = require('../model/user')
+const Post = require('../model/post')
 const jwt = require('jsonwebtoken')
 const JWT_SECRET = process.env.JWT_SECRET
 
@@ -11,6 +12,7 @@ const typeDef = gql`
     username: String!
     password: String!
     wxId: String
+    questions: [Post!]
   }
   extend type Query {
     users(searchBy: UserInput!): [User!]
@@ -129,6 +131,9 @@ console.log(update)
       }
       return user2token(user)
     }
+  },
+  User: {
+    questions: (parent) => Post.find({ author: parent.id, title: { $ne: null } })
   }
 }
 
