@@ -8,6 +8,7 @@ const typeDef = gql`
     id: ID!
     participants: [User!]
     messages: [Message!]
+    latestMessage: Message
   }
   extend type Mutation {
     createConversation(input: CreateConversationInput!): CreateConversationPayload
@@ -33,7 +34,8 @@ const resolvers = {
   },
   Conversation: {
     participants: (parent) => User.find({ '_id': { $in: parent.participants }}),
-    messages: (parent) => Message.find({ conversation: parent.id })
+    messages: (parent) => Message.find({ conversation: parent.id }),
+    latestMessage: (parent) => Message.findOne({ conversation: parent.id }, {}, { sort: { 'createdAt': -1 } }),
   }
 }
 
