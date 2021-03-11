@@ -9,8 +9,10 @@ const typeDef = gql`
     content: String!
     author: User!
     votes: [Vote!]
+    vote: Int
     title: String
     answers: [Post!]
+    answerCount: Int
     comments: [Comment!]
     createdAt: Date
     updatedAt: Date
@@ -107,7 +109,9 @@ const resolvers = {
   },
   Post: {
     author: (parent) => User.findById(parent.author),
-    answers: (parent) => Post.find({ '_id': { $in: parent.answers }})
+    answers: (parent) => Post.find({ '_id': { $in: parent.answers }}),
+    answerCount: (parent) => Post.find({ '_id': { $in: parent.answers } }).count(),
+    vote: (parent) => parent.votes.map(v => v.vote).reduce((acc, cur) => Math.sum(acc, cur), 0),
   },
   Vote: {
     voterId: (parent) => parent.voter,
