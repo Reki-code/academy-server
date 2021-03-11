@@ -9,6 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET
 const typeDef = gql`
   type User {
     id: ID!
+    displayName: String!
     type: String!
     username: String!
     password: String!
@@ -135,6 +136,7 @@ console.log(update)
     }
   },
   User: {
+    displayName: (parent) => parent.displayName ? parent.displayName : parent.username,
     questions: (parent) => Post.find({ author: parent.id, title: { $ne: null } }),
     conversations: (parent) => Conversation.find({ participants: parent.id })
   }

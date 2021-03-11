@@ -10,6 +10,9 @@ const typeDef = gql`
     messages: [Message!]
     latestMessage: Message
   }
+  extend type Query {
+    conversation(id: ID!): Conversation
+  }
   extend type Mutation {
     createConversation(input: CreateConversationInput!): CreateConversationPayload
   }
@@ -22,6 +25,9 @@ const typeDef = gql`
 `
 
 const resolvers = {
+  Query: {
+    conversation: (root, args) => Conversation.findById(args.id)
+  },
   Mutation: {
     createConversation: async (root, args) => {
       const input = args.input
@@ -33,7 +39,7 @@ const resolvers = {
     }
   },
   Conversation: {
-    participants: (parent) => User.find({ '_id': { $in: parent.participants }}),
+    participants: (parent) => User.find({ '_id': { $in: parent.participants } }),
     messages: (parent) => Message.find({ conversation: parent.id }),
     latestMessage: (parent) => Message.findOne({ conversation: parent.id }, {}, { sort: { 'createdAt': -1 } }),
   }
