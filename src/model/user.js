@@ -13,6 +13,8 @@ const schema = new mongoose.Schema({
     type: String,
     required: true
   },
+  displayName: String,
+  avatar: String,
   wxId: {
     type: String
   }

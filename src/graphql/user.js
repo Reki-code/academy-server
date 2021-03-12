@@ -10,6 +10,7 @@ const typeDef = gql`
   type User {
     id: ID!
     displayName: String!
+    avatar: String!
     type: String!
     username: String!
     password: String!
@@ -136,7 +137,8 @@ console.log(update)
     }
   },
   User: {
-    displayName: (parent) => parent.displayName ? parent.displayName : parent.username,
+    displayName: (parent) => parent.displayName ?? parent.username,
+    avatar: (parent) => parent.avatar ?? 'https://avatars.githubusercontent.com/u/32997723?s=460&u=ebb97e29c0bc717c30aa61b99f75520bebe73aa2&v=4',
     questions: (parent) => Post.find({ author: parent.id, title: { $ne: null } }),
     conversations: (parent) => Conversation.find({ participants: parent.id })
   }
