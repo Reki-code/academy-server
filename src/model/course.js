@@ -13,6 +13,10 @@ const schema = new Schema({
   questions: [{
     type: Schema.Types.ObjectId,
     ref: 'Post'
+  }],
+  announcements: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Announcement'
   }]
 })
 

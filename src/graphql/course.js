@@ -2,6 +2,7 @@ const { gql, UserInputError } = require('apollo-server')
 const Course = require('../model/course')
 const User = require('../model/user')
 const Post = require('../model/post')
+const Announcement = require('../model/announcement')
 
 const typeDef = gql`
   type Course {
@@ -9,6 +10,7 @@ const typeDef = gql`
     title: String!
     teacher: User!
     questions: [Post!]
+    announcements: [Announcement!]
   }
   extend type Query {
     courses(searchBy: CourseInput!): [Course!]
@@ -23,6 +25,7 @@ const typeDef = gql`
     createCourse(input: CreateCourseInput!): CreateCoursePayload
     updateCourse(input: UpdateCourseInput!): UpdateCoursePayload
     courseAddQuestion(input: CourseAddQuestionInput!): CourseAddQuestionPayload
+    courseAddAnnouncement(input: CourseAddAnnouncementInput!): CourseAddAnnouncementPayload
   }
   input CreateCourseInput {
     title: String!
@@ -44,6 +47,13 @@ const typeDef = gql`
     questionId: String
   }
   type CourseAddQuestionPayload {
+    course: Course
+  }
+  input CourseAddAnnouncementInput {
+    courseId: String!
+    announcementId: String!
+  }
+  type CourseAddAnnouncementPayload {
     course: Course
   }
 `
@@ -82,11 +92,20 @@ const resolvers = {
         { $push: { questions: input.questionId } },
         { new: true })
       return { course: newCourse }
-    }
+    },
+    courseAddAnnouncement: async (root, args) => {
+      const input = args.input
+      const newCourse = await Course.findByIdAndUpdate(
+        input.courseId,
+        { $push: { announcements: input.announcementId } },
+        { new: true })
+      return { course: newCourse }
+    },
   },
   Course: {
     teacher: (parent) => User.findById(parent.teacher),
     questions: (parent) => Post.find({ '_id': { $in: parent.questions } }),
+    announcements: (parent) => Announcement.find({ '_id': { $in: parent.announcements }}),
   }
 }
 
