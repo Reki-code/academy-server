@@ -45,6 +45,7 @@ const typeDef = gql`
   input CourseAddQuestionInput {
     courseId: String!
     questionId: String
+    question: CreatePostInput
   }
   type CourseAddQuestionPayload {
     course: Course
@@ -85,13 +86,27 @@ const resolvers = {
         .findByIdAndUpdate(input.id, input, { new: true })
       return { course: newCourse }
     },
-    courseAddQuestion: async (root, args) => {
+    courseAddQuestion: async (root, args, { currentUser }) => {
       const input = args.input
-      const newCourse = await Course.findByIdAndUpdate(
-        input.courseId,
-        { $push: { questions: input.questionId } },
-        { new: true })
-      return { course: newCourse }
+      if (input.questionId) {
+        const newCourse = await Course.findByIdAndUpdate(
+          input.courseId,
+          { $push: { questions: input.questionId } },
+          { new: true })
+        return { course: newCourse }
+      } else {
+        const question = new Post({
+          title: input.question.title,
+          author: currentUser.id,
+          content: input.question.content,
+        })
+        const savedQuestion = await question.save()
+        const newCourse = await Course.findByIdAndUpdate(
+          input.courseId,
+          { $push: { questions: savedQuestion.id } },
+          { new: true })
+        return { course: newCourse }
+      }
     },
     courseAddAnnouncement: async (root, args) => {
       const input = args.input
