@@ -4,6 +4,7 @@ const User = require('../model/user')
 const Post = require('../model/post')
 const Announcement = require('../model/announcement')
 const Group = require('../model/group')
+const Enrollment = require('../model/enrollment')
 
 const typeDef = gql`
   type Course {
@@ -13,6 +14,7 @@ const typeDef = gql`
     questions: [Post!]
     announcements: [Announcement!]
     group: Group
+    userEnrolled: [User!]
   }
   extend type Query {
     courses(searchBy: CourseInput!): [Course!]
@@ -129,6 +131,12 @@ const resolvers = {
     questions: (parent) => Post.find({ '_id': { $in: parent.questions } }),
     announcements: (parent) => Announcement.find({ '_id': { $in: parent.announcements }}),
     group: (parent) => Group.findById(parent.group),
+    userEnrolled: async (parent) => {
+      const enrollments = await Enrollment.
+        find({ courseEnrolled: parent.id }).
+        populate('userEnrolled')
+      return enrollments.map(enrollment => enrollment.userEnrolled)
+    },
   }
 }
 

@@ -3,6 +3,7 @@ const axios = require('axios').default
 const User = require('../model/user')
 const Post = require('../model/post')
 const Conversation = require('../model/conversation')
+const Enrollment = require('../model/enrollment')
 const jwt = require('jsonwebtoken')
 const JWT_SECRET = process.env.JWT_SECRET
 
@@ -17,6 +18,7 @@ const typeDef = gql`
     wxId: String
     questions: [Post!]
     conversations: [Conversation!]
+    courseEnrolled: [Course!]
   }
   extend type Query {
     users(searchBy: UserInput!): [User!]
@@ -140,8 +142,14 @@ console.log(update)
     displayName: (parent) => parent.displayName ?? parent.username,
     avatar: (parent) => parent.avatar ?? 'https://avatars.githubusercontent.com/u/32997723?s=460&u=ebb97e29c0bc717c30aa61b99f75520bebe73aa2&v=4',
     questions: (parent) => Post.find({ author: parent.id, title: { $ne: null } }),
-    conversations: (parent) => Conversation.find({ participants: parent.id })
-  }
+    conversations: (parent) => Conversation.find({ participants: parent.id }),
+    courseEnrolled: async (parent) => {
+      const enrollments = await Enrollment.
+        find({ userEnrolled: parent.id }).
+        populate('courseEnrolled')
+      return enrollments.map(enrollment => enrollment.courseEnrolled)
+    },
+  },
 }
 
 module.exports = {
