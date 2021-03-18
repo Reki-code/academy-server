@@ -3,6 +3,7 @@ const Course = require('../model/course')
 const User = require('../model/user')
 const Post = require('../model/post')
 const Announcement = require('../model/announcement')
+const Group = require('../model/group')
 
 const typeDef = gql`
   type Course {
@@ -11,6 +12,7 @@ const typeDef = gql`
     teacher: User!
     questions: [Post!]
     announcements: [Announcement!]
+    group: Group
   }
   extend type Query {
     courses(searchBy: CourseInput!): [Course!]
@@ -67,9 +69,14 @@ const resolvers = {
   Mutation: {
     createCourse: async (root, args) => {
       const input = args.input
+      const group = new Group({
+        name: 'DEFAULT',
+      })
+      const defaultGroup = await group.save()
       const course = new Course({
         title: input.title,
-        teacher: input.teacherId
+        teacher: input.teacherId,
+        group: defaultGroup.id,
       })
       try {
         const savedCourse = await course.save()
@@ -121,6 +128,7 @@ const resolvers = {
     teacher: (parent) => User.findById(parent.teacher),
     questions: (parent) => Post.find({ '_id': { $in: parent.questions } }),
     announcements: (parent) => Announcement.find({ '_id': { $in: parent.announcements }}),
+    group: (parent) => Group.findById(parent.group),
   }
 }
 

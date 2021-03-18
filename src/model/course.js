@@ -17,7 +17,11 @@ const schema = new Schema({
   announcements: [{
     type: Schema.Types.ObjectId,
     ref: 'Announcement'
-  }]
+  }],
+  group: {
+    type: Schema.Types.ObjectId,
+    ref: 'Group'
+  },
 })
 
 module.exports = mongoose.model('Course', schema)

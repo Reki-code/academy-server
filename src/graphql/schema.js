@@ -19,6 +19,7 @@ const post = require('./post')
 const conversation = require('./conversation')
 const message = require('./message')
 const announcement = require('./announcement')
+const group = require('./group')
 
 const schema = makeExecutableSchema({
   typeDefs: [
@@ -30,6 +31,7 @@ const schema = makeExecutableSchema({
     conversation.typeDef,
     message.typeDef,
     announcement.typeDef,
+    group.typeDef,
   ],
   resolvers: [
     date.resolvers,
@@ -39,6 +41,7 @@ const schema = makeExecutableSchema({
     conversation.resolvers,
     message.resolvers,
     announcement.resolvers,
+    group.resolvers,
   ]
 })
 
