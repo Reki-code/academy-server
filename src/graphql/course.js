@@ -3,6 +3,7 @@ const Course = require('../model/course')
 const User = require('../model/user')
 const Post = require('../model/post')
 const Announcement = require('../model/announcement')
+const Quiz = require('../model/quiz')
 const Group = require('../model/group')
 const Enrollment = require('../model/enrollment')
 
@@ -13,6 +14,7 @@ const typeDef = gql`
     teacher: User!
     questions: [Post!]
     announcements: [Announcement!]
+    quizzes: [Quiz!]
     group: Group
     userEnrolled: [User!]
   }
@@ -130,6 +132,7 @@ const resolvers = {
     teacher: (parent) => User.findById(parent.teacher),
     questions: (parent) => Post.find({ '_id': { $in: parent.questions } }),
     announcements: (parent) => Announcement.find({ '_id': { $in: parent.announcements }}),
+    quizzes: (parent) => Quiz.find({ _id: { $in: parent.quizs } }),
     group: (parent) => Group.findById(parent.group),
     userEnrolled: async (parent) => {
       const enrollments = await Enrollment.

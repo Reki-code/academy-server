@@ -18,6 +18,10 @@ const schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Announcement'
   }],
+  quizs: {
+    type: Schema.Types.ObjectId,
+    ref: 'Quiz'
+  },
   group: {
     type: Schema.Types.ObjectId,
     ref: 'Group'
