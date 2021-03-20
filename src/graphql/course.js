@@ -32,6 +32,7 @@ const typeDef = gql`
     updateCourse(input: UpdateCourseInput!): UpdateCoursePayload
     courseAddQuestion(input: CourseAddQuestionInput!): CourseAddQuestionPayload
     courseAddAnnouncement(input: CourseAddAnnouncementInput!): CourseAddAnnouncementPayload
+    courseAddQuiz(input: CourseAddQuizInput!): CourseAddQuizPayload
   }
   input CreateCourseInput {
     title: String!
@@ -61,6 +62,13 @@ const typeDef = gql`
     announcementId: String!
   }
   type CourseAddAnnouncementPayload {
+    course: Course
+  }
+  input CourseAddQuizInput {
+    courseId: String!
+    quiz: CreateQuizInput
+  }
+  type CourseAddQuizPayload {
     course: Course
   }
 `
@@ -127,12 +135,22 @@ const resolvers = {
         { new: true })
       return { course: newCourse }
     },
+    courseAddQuiz: async (root, args) => {
+      const { courseId, quiz: quizInfo } = args.input
+      const quiz = new Quiz(quizInfo)
+      const savedQuiz = await quiz.save()
+      const newCourse = await Course.findByIdAndUpdate(
+        courseId,
+        { $push: { quizzes: savedQuiz.id } },
+        { new: true })
+      return { course: newCourse }
+    },
   },
   Course: {
     teacher: (parent) => User.findById(parent.teacher),
     questions: (parent) => Post.find({ '_id': { $in: parent.questions } }),
     announcements: (parent) => Announcement.find({ '_id': { $in: parent.announcements }}),
-    quizzes: (parent) => Quiz.find({ _id: { $in: parent.quizs } }),
+    quizzes: (parent) => Quiz.find({ _id: { $in: parent.quizzes } }),
     group: (parent) => Group.findById(parent.group),
     userEnrolled: async (parent) => {
       const enrollments = await Enrollment.

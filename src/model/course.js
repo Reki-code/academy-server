@@ -18,7 +18,7 @@ const schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Announcement'
   }],
-  quizs: {
+  quizzes: {
     type: Schema.Types.ObjectId,
     ref: 'Quiz'
   },
