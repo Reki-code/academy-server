@@ -115,6 +115,7 @@ const resolvers = {
   Quiz: {
     pass: async (parent, args, { currentUser }) => {
       const total = parent.questions.length
+      if (total === 0) return -1
       const best = parent.
         submissions.
         filter(submission => submission.user.toString() === currentUser.id).
