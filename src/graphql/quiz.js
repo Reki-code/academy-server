@@ -98,7 +98,7 @@ const resolvers = {
       const correct = questions.
         filter((question, index) => compareAnswer(question.type, question.answer, answers[index]))
       const grade = correct.length
-      const newQuiz = await Quiz.findByIdAndUpdate(
+      await Quiz.findByIdAndUpdate(
         quizId,
         {$push: { 
           submissions: {
@@ -106,7 +106,6 @@ const resolvers = {
           answers,
           grade,
         }}},
-        { new: true}
       )
       const course = await Course.find({ quizzes: quizId })
       return { course: course[0] }
