@@ -1,6 +1,8 @@
 const { gql } = require('apollo-server')
 const Quiz = require('../model/quiz')
 const User = require('../model/user')
+const Course = require('../model/course')
+const { equals } = require('ramda')
 
 const typeDef = gql`
   type Quiz {
@@ -35,6 +37,7 @@ const typeDef = gql`
   }
   extend type Mutation {
     createQuiz(input: CreateQuizInput!): CreateQuizPayload
+    submitAnswer(input: SubmitAnswerInput!): SubmitAnswerPayload
   }
   input CreateQuizInput {
     title: String
@@ -59,7 +62,22 @@ const typeDef = gql`
   type CreateQuizPayload {
     quiz: Quiz
   }
+  input SubmitAnswerInput {
+    quizId: String
+    answers: [QuizAnswerInput!]
+  }
+  type SubmitAnswerPayload {
+    course: Course
+  }
 `
+
+const compareAnswer = (type, a, b) => {
+  if (type === 'multiple') {
+    return equals(a['multiple'], b['multiple'])
+  } else {
+    return a[type] === b[type]
+  }
+}
 
 const resolvers = {
   Query: {
@@ -70,7 +88,29 @@ const resolvers = {
       const quiz = new Quiz(args.input)
       const saved = await quiz.save()
       return { quiz: saved }
-    }
+    },
+    submitAnswer: async (root, args, { currentUser }) => {
+      const { quizId, answers } = args.input
+      const questions = (await Quiz.findById(quizId).select('questions')).questions
+      if (answers.length !== questions.length) {
+        return null
+      }
+      const correct = questions.
+        filter((question, index) => compareAnswer(question.type, question.answer, answers[index]))
+      const grade = correct.length
+      const newQuiz = await Quiz.findByIdAndUpdate(
+        quizId,
+        {$push: { 
+          submissions: {
+          user: currentUser.id,
+          answers,
+          grade,
+        }}},
+        { new: true}
+      )
+      const course = await Course.find({ quizzes: quizId })
+      return { course: course[0] }
+    },
   },
   Quiz: {
     submissions: {
