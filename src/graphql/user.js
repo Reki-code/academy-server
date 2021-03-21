@@ -44,6 +44,7 @@ const typeDef = gql`
   }
   input CreateUserInput {
     type: Type!
+    displayName: String
     username: String!
     password: String!
   }
@@ -52,6 +53,7 @@ const typeDef = gql`
   }
   input UpdateUserInput {
     id: ID!
+    displayName: String
     username: String
     password: String
   }
