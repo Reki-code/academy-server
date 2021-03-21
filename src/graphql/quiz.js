@@ -2,7 +2,7 @@ const { gql } = require('apollo-server')
 const Quiz = require('../model/quiz')
 const User = require('../model/user')
 const Course = require('../model/course')
-const { equals } = require('ramda')
+const { equals, max } = require('ramda')
 
 const typeDef = gql`
   type Quiz {
@@ -11,6 +11,7 @@ const typeDef = gql`
     questions: [QuizQuestion!]
     dueDate: Date
     submissions: [Submission!]
+    pass: Float
   }
   type QuizQuestion {
     type: String
@@ -112,9 +113,17 @@ const resolvers = {
     },
   },
   Quiz: {
-    submissions: {
-      user: (parent) => User.findById(parent.user),
+    pass: async (parent, args, { currentUser }) => {
+      const total = parent.questions.length
+      const best = parent.
+        submissions.
+        filter(submission => submission.user.toString() === currentUser.id).
+        reduce((acc, curr) => max(acc, curr.grade), -1)
+      return best / total
     }
+  },
+  Submission: {
+    user: (parent) => User.findById(parent.user),
   }
 }
 
