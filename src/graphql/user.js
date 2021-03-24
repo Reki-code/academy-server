@@ -31,6 +31,8 @@ const typeDef = gql`
   extend type Mutation {
     createUser(input: CreateUserInput!): CreateUserPayload
     updateUser(input: UpdateUserInput!): UpdateUserPayload
+    changePassword(input: ChangePasswordInput!): ChangePasswordPayload
+    deleteUser(input: DeleteUserInput!): DeleteUserPayload
     login(
       username: String!
       password: String!
@@ -58,6 +60,20 @@ const typeDef = gql`
     password: String
   }
   type UpdateUserPayload {
+    user: User
+  }
+  input ChangePasswordInput {
+    old: String!
+    new: String!
+  }
+  type ChangePasswordPayload {
+    user: User
+    success: Boolean
+  }
+  input DeleteUserInput {
+    id: ID!
+  }
+  type DeleteUserPayload {
     user: User
   }
   enum Type {
@@ -91,12 +107,8 @@ const resolvers = {
   },
   Mutation: {
     createUser: async (root, args) => {
-      const input = args.input
-      const user = new User({
-        type: input.type,
-        username: input.username,
-        password: input.password
-      })
+      const { type, displayName, username, password } = args.input
+      const user = new User({ type, displayName, username, password })
       try {
         const savedUser = await user.save()
         return { user: savedUser }
@@ -110,6 +122,24 @@ const resolvers = {
       const input = args.input
       const newUser = await User.findByIdAndUpdate(input.id, input, { new: true })
       return { user: newUser }
+    },
+    changePassword: async (root, args, { currentUser }) => {
+      const input = args.input
+      const user =  await User.findById(currentUser.id)
+      if (user.password === input.old) {
+        const updated = await User.findByIdAndUpdate(
+          currentUser.id,
+          { password: input.new },
+          { new: true }
+        )
+        return { success: true, user: updated }
+      } else {
+        return { success: false }
+      }
+    },
+    deleteUser: async (root, args) => {
+      const user = await User.findByIdAndRemove(args.input.id)
+      return { user }
     },
     login: async (root, args) => {
       const user = await User.findOne({ username: args.username, password: args.password })
