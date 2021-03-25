@@ -11,6 +11,7 @@ const typeDef = gql`
   type Course {
     id: ID!
     title: String!
+    cover: String!
     teacher: User!
     questions: [Post!]
     announcements: [Announcement!]
@@ -147,6 +148,7 @@ const resolvers = {
     },
   },
   Course: {
+    cover: (parent) => parent.cover ?? 'https://i.loli.net/2021/03/24/BQ7oSbgtFiPexNw.jpg',
     teacher: (parent) => User.findById(parent.teacher),
     questions: (parent) => Post.find({ '_id': { $in: parent.questions } }),
     announcements: (parent) => Announcement.find({ '_id': { $in: parent.announcements }}),
