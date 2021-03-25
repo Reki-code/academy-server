@@ -39,7 +39,7 @@ const resolvers = {
       const conversation = await Conversation.find({
         participants: {
           $size: participants.length,
-          $in: participants,
+          $all: participants,
         }
       })
       if (conversation[0]) {
