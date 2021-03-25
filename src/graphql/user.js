@@ -24,6 +24,8 @@ const typeDef = gql`
     users(searchBy: UserInput!): [User!]
     user(id: ID!): User
     me: User
+    countTeacher: Int
+    countStudent: Int
   }
   input UserInput {
     type: Type
@@ -103,7 +105,9 @@ const resolvers = {
   Query: {
     users: (parent, args) => User.find(args.searchBy),
     user: (parent, args) => User.findById(args.id),
-    me: (parent, args, { currentUser }) => currentUser
+    me: (parent, args, { currentUser }) => currentUser,
+    countTeacher: (parent) => User.find({ type: 'TEACHER' }).count(),
+    countStudent: (parent) => User.find({ type: 'STUDENT' }).count(),
   },
   Mutation: {
     createUser: async (root, args) => {

@@ -11,7 +11,10 @@ const typeDef = gql`
     latestMessage: Message
   }
   extend type Query {
-    conversation(id: ID!): Conversation
+    conversation(id: ID, searchBy: ConversationInput): Conversation
+  }
+  input ConversationInput {
+    participants: [String!]
   }
   extend type Mutation {
     createConversation(input: CreateConversationInput!): CreateConversationPayload
@@ -26,7 +29,28 @@ const typeDef = gql`
 
 const resolvers = {
   Query: {
-    conversation: (root, args) => Conversation.findById(args.id)
+    conversation: async (root, args) => {
+      const { id, searchBy } = args
+      if (id) {
+        return Conversation.findById(args.id)
+      }
+      const { participants } = searchBy
+      if (participants.length !== 2) return null
+      const conversation = await Conversation.find({
+        participants: {
+          $size: participants.length,
+          $in: participants,
+        }
+      })
+      if (conversation[0]) {
+        return conversation[0]
+      }
+      const newConversation = new Conversation({
+        participants
+      })
+      const saved = await newConversation.save()
+      return saved
+    },
   },
   Mutation: {
     createConversation: async (root, args) => {

@@ -22,6 +22,7 @@ const typeDef = gql`
   extend type Query {
     courses(searchBy: CourseInput!): [Course!]
     course(id: ID!): Course
+    countCourse: Int
   }
   input CourseInput {
     id: ID
@@ -78,6 +79,7 @@ const resolvers = {
   Query: {
     courses: (root, args) => Course.find(args.searchBy),
     course: (root, args) => Course.findById(args.id),
+    countCourse: (root) => Course.count(),
   },
   Mutation: {
     createCourse: async (root, args) => {
