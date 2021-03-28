@@ -46,7 +46,7 @@ const resolvers = {
         return conversation[0]
       }
       const newConversation = new Conversation({
-        participants
+        participants: [...participants, currentUser.id]
       })
       const saved = await newConversation.save()
       return saved
