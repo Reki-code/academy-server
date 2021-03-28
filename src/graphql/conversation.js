@@ -29,17 +29,17 @@ const typeDef = gql`
 
 const resolvers = {
   Query: {
-    conversation: async (root, args) => {
+    conversation: async (root, args, { currentUser }) => {
       const { id, searchBy } = args
       if (id) {
         return Conversation.findById(args.id)
       }
       const { participants } = searchBy
-      if (participants.length !== 2) return null
+      if (participants.length !== 1) return null
       const conversation = await Conversation.find({
         participants: {
-          $size: participants.length,
-          $all: participants,
+          $size: 2,
+          $all: [...participants, currentUser.id],
         }
       })
       if (conversation[0]) {
