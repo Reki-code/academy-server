@@ -11,6 +11,7 @@ const typeDef = gql`
   type Course {
     id: ID!
     title: String!
+    createdAt: Date
     cover: String!
     teacher: User!
     questions: [Post!]
@@ -25,7 +26,7 @@ const typeDef = gql`
     countCourse: Int
   }
   input CourseInput {
-    id: ID
+    open: Boolean
     title: String
     teacher: String
   }
@@ -39,12 +40,14 @@ const typeDef = gql`
   input CreateCourseInput {
     title: String!
     teacherId: String!
+    open: Boolean
   }
   type CreateCoursePayload {
     course: Course
   }
   input UpdateCourseInput {
     id: ID!
+    open: Boolean
     title: String
     teacherId: String
   }
@@ -92,6 +95,7 @@ const resolvers = {
         title: input.title,
         teacher: input.teacherId,
         group: defaultGroup.id,
+        open: input.open,
       })
       try {
         const savedCourse = await course.save()
