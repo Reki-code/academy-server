@@ -81,7 +81,7 @@ const typeDef = gql`
 
 const resolvers = {
   Query: {
-    courses: (root, args) => Course.find(args.searchBy),
+    courses: (root, args) => Course.find(args.searchBy).sort('-createdAt'),
     course: (root, args) => Course.findById(args.id),
     countCourse: (root) => Course.count(),
   },
