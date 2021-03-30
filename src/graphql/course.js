@@ -19,6 +19,7 @@ const typeDef = gql`
     quizzes: [Quiz!]
     group: Group
     userEnrolled: [User!]
+    countEnrolled: Int
   }
   extend type Query {
     courses(searchBy: CourseInput!): [Course!]
@@ -165,6 +166,12 @@ const resolvers = {
         find({ courseEnrolled: parent.id }).
         populate('userEnrolled')
       return enrollments.map(enrollment => enrollment.userEnrolled)
+    },
+    countEnrolled: (parent) => {
+      return Enrollment.
+        find({ courseEnrolled: parent.id }).
+        populate('userEnrolled').
+        count()
     },
   }
 }
