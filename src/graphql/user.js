@@ -4,6 +4,7 @@ const User = require('../model/user')
 const Post = require('../model/post')
 const Conversation = require('../model/conversation')
 const Enrollment = require('../model/enrollment')
+const Course = require('../model/course')
 const jwt = require('jsonwebtoken')
 const JWT_SECRET = process.env.JWT_SECRET
 
@@ -19,6 +20,7 @@ const typeDef = gql`
     questions: [Post!]
     conversations: [Conversation!]
     courseEnrolled: [Course!]
+    courseTeache: [Course!]
   }
   extend type Query {
     users(searchBy: UserInput!): [User!]
@@ -185,6 +187,7 @@ console.log(update)
         populate('courseEnrolled')
       return enrollments.map(enrollment => enrollment.courseEnrolled)
     },
+    courseTeache: (parent) => Course.find({ teacher: parent.id }),
   },
 }
 
