@@ -41,7 +41,7 @@ const resolvers = {
   Query: {
     announcements: (root, args) => {
       const { limit } = args.searchBy
-      return Announcement.find({ forAll: true }).limit(limit)
+      return Announcement.find({ forAll: true }).sort('-createdAt').limit(limit)
     },
   },
   Mutation: {
