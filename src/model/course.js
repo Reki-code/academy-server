@@ -7,6 +7,7 @@ const schema = new Schema({
     type: String,
     required: true
   },
+  description: String,
   teacher: {
     type: Schema.Types.ObjectId,
     ref: 'User'

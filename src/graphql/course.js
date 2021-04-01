@@ -11,6 +11,7 @@ const typeDef = gql`
   type Course {
     id: ID!
     title: String!
+    description: String
     createdAt: Date
     cover: String!
     teacher: User!
@@ -43,6 +44,7 @@ const typeDef = gql`
     title: String!
     teacherId: String!
     open: Boolean
+    description: String
   }
   type CreateCoursePayload {
     course: Course
@@ -52,6 +54,7 @@ const typeDef = gql`
     open: Boolean
     title: String
     teacherId: String
+    description: String
   }
   type UpdateCoursePayload {
     course: Course
@@ -98,6 +101,7 @@ const resolvers = {
         teacher: input.teacherId,
         group: defaultGroup.id,
         open: input.open,
+        description: input.description,
       })
       try {
         const savedCourse = await course.save()
