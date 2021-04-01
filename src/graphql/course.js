@@ -22,6 +22,15 @@ const typeDef = gql`
     userEnrolled: [User!]
     countEnrolled: Int
     isEnrolled: Boolean
+    topics: [TOPIC!]
+  }
+  type TOPIC {
+    title: String
+    description: String
+    resource: [RESOURCE!]
+  }
+  type RESOURCE {
+    type: String
   }
   extend type Query {
     courses(searchBy: CourseInput!): [Course!]

@@ -28,6 +28,14 @@ const schema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'Group'
   },
+  topics: [{
+    title: String,
+    description: String,
+    resource: [{
+      type: String,
+      enum: ['video', 'text'],
+    }],
+  }],
 }, {
   timestamps: true,
 })
