@@ -26,6 +26,13 @@ const resolvers = {
     enroll: async (root, args, { currentUser }) => {
       const { courseId, userId } = args.input
       const student = userId ?? currentUser.id
+      const enroll = Enrollment.find({
+        userEnrolled: student,
+        courseEnrolled: courseId,
+      })
+      if (enroll[0]) {
+        return { enrollment: enroll[0] }
+      }
       const enrollment = new Enrollment({
         userEnrolled: student,
         courseEnrolled: courseId,
