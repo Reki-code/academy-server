@@ -20,6 +20,7 @@ const typeDef = gql`
     group: Group
     userEnrolled: [User!]
     countEnrolled: Int
+    isEnrolled: Boolean
   }
   extend type Query {
     courses(searchBy: CourseInput!): [Course!]
@@ -172,6 +173,14 @@ const resolvers = {
         find({ courseEnrolled: parent.id }).
         populate('userEnrolled').
         count()
+    },
+    isEnrolled: async (parent, args, { currentUser }) => {
+      const count = await Enrollment.find({
+        courseEnrolled: parent.id,
+        userEnrolled: currentUser.id,
+      }).
+        count()
+      return count >= 1
     },
   }
 }
