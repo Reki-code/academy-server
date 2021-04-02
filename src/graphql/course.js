@@ -6,6 +6,7 @@ const Announcement = require('../model/announcement')
 const Quiz = require('../model/quiz')
 const Group = require('../model/group')
 const Enrollment = require('../model/enrollment')
+const Resource = require('../model/resource')
 
 const typeDef = gql`
   type Course {
@@ -22,15 +23,12 @@ const typeDef = gql`
     userEnrolled: [User!]
     countEnrolled: Int
     isEnrolled: Boolean
-    topics: [TOPIC!]
+    topics: [Topic!]
   }
-  type TOPIC {
+  type Topic {
     title: String
     description: String
-    resource: [RESOURCE!]
-  }
-  type RESOURCE {
-    type: String
+    resources: [Resource!]
   }
   extend type Query {
     courses(searchBy: CourseInput!): [Course!]
@@ -48,6 +46,7 @@ const typeDef = gql`
     courseAddQuestion(input: CourseAddQuestionInput!): CourseAddQuestionPayload
     courseAddAnnouncement(input: CourseAddAnnouncementInput!): CourseAddAnnouncementPayload
     courseAddQuiz(input: CourseAddQuizInput!): CourseAddQuizPayload
+    courseAddTopic(input: CourseAddTopicInput!): CourseAddTopicPayload
   }
   input CreateCourseInput {
     title: String!
@@ -88,6 +87,15 @@ const typeDef = gql`
     quiz: CreateQuizInput
   }
   type CourseAddQuizPayload {
+    course: Course
+  }
+  input CourseAddTopicInput {
+    courseId: String!
+    title: String
+    description: String
+    resources: [CreateResourceInput!]
+  }
+  type CourseAddTopicPayload {
     course: Course
   }
 `
@@ -167,6 +175,17 @@ const resolvers = {
         { new: true })
       return { course: newCourse }
     },
+    courseAddTopic: async (root, args) => {
+      const { courseId, resources, ...topic } = args.input
+      const savedResources = await Resource.insertMany(resources)
+      const resourceIds = savedResources.map(r => r._id)
+      const newCourse = await Course.findByIdAndUpdate(
+        courseId,
+        { $push: { topics: { ...topic, resources: resourceIds } } },
+        { new: true }
+      )
+      return { course: newCourse }
+    },
   },
   Course: {
     cover: (parent) => parent.cover ?? 'https://i.loli.net/2021/03/24/BQ7oSbgtFiPexNw.jpg',
@@ -195,7 +214,10 @@ const resolvers = {
         count()
       return count >= 1
     },
-  }
+  },
+  Topic: {
+    resources: (parent) => Resource.find({ _id: { $in: parent.resources }}),
+  },
 }
 
 module.exports = {

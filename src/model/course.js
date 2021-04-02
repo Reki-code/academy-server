@@ -31,9 +31,9 @@ const schema = new Schema({
   topics: [{
     title: String,
     description: String,
-    resource: [{
-      type: String,
-      enum: ['video', 'text'],
+    resources: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Resource',
     }],
   }],
 }, {
