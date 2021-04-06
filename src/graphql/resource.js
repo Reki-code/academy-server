@@ -3,6 +3,7 @@ const Resource = require('../model/resource')
 
 const typeDef = gql`
   type Resource {
+    id: ID!
     title: String
     category: String
     content: String
