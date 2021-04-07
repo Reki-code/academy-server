@@ -50,7 +50,7 @@ const typeDef = gql`
   }
   input CreateCourseInput {
     title: String!
-    teacherId: String!
+    teacherId: String
     open: Boolean
     description: String
   }
@@ -107,7 +107,7 @@ const resolvers = {
     countCourse: (root) => Course.count(),
   },
   Mutation: {
-    createCourse: async (root, args) => {
+    createCourse: async (root, args, { currentUser }) => {
       const input = args.input
       const group = new Group({
         name: 'DEFAULT',
@@ -115,7 +115,7 @@ const resolvers = {
       const defaultGroup = await group.save()
       const course = new Course({
         title: input.title,
-        teacher: input.teacherId,
+        teacher: input.teacherId ?? currentUser.id,
         group: defaultGroup.id,
         open: input.open,
         description: input.description,
