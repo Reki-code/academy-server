@@ -69,6 +69,7 @@ const typeDef = gql`
   }
   type SubmitAnswerPayload {
     course: Course
+    grade: Int
   }
 `
 
@@ -109,7 +110,7 @@ const resolvers = {
         }}},
       )
       const course = await Course.find({ quizzes: quizId })
-      return { course: course[0] }
+      return { course: course[0], grade }
     },
   },
   Quiz: {
