@@ -16,6 +16,7 @@ const typeDef = gql`
     comments: [Comment!]
     createdAt: Date
     updatedAt: Date
+    isFavorite: Boolean
   }
   type Vote {
     voter: User,
@@ -135,6 +136,7 @@ const resolvers = {
     answers: (parent) => Post.find({ '_id': { $in: parent.answers }}),
     answerCount: (parent) => Post.find({ '_id': { $in: parent.answers } }).count(),
     vote: (parent) => parent.votes.map(v => v.vote).reduce((acc, cur) => Math.sum(acc, cur), 0),
+    isFavorite: (parent, args, { currentUser }) => currentUser.favorite?.questions?.includes(parent.id),
   },
   Vote: {
     voterId: (parent) => parent.voter,

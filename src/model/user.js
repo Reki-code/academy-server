@@ -17,6 +17,12 @@ const schema = new mongoose.Schema({
   avatar: String,
   wxId: {
     type: String
+  },
+  favorite: {
+    questions: [{
+      type: mongoose.Types.ObjectId,
+      ref: 'Post',
+    }],
   }
 })
 

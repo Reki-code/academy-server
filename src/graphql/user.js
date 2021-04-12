@@ -21,6 +21,10 @@ const typeDef = gql`
     conversations: [Conversation!]
     courseEnrolled: [Course!]
     courseTeache: [Course!]
+    favorite: Favorite
+  }
+  type Favorite {
+    questions: [Post!]
   }
   extend type Query {
     users(searchBy: UserInput!): [User!]
@@ -47,6 +51,7 @@ const typeDef = gql`
       password: String!
       code: String!
     ): Token
+    favorite(input: FavoriteInput!): FavoritePayload
   }
   input CreateUserInput {
     type: Type!
@@ -84,6 +89,13 @@ const typeDef = gql`
     ADMIN
     TEACHER
     STUDENT
+  }
+  input FavoriteInput {
+    type: String!
+    id: String
+  }
+  type FavoritePayload {
+    user: User
   }
 `
 
@@ -131,7 +143,7 @@ const resolvers = {
     },
     changePassword: async (root, args, { currentUser }) => {
       const input = args.input
-      const user =  await User.findById(currentUser.id)
+      const user = await User.findById(currentUser.id)
       if (user.password === input.old) {
         const updated = await User.findByIdAndUpdate(
           currentUser.id,
@@ -168,13 +180,23 @@ const resolvers = {
 
       const filter = { username: args.username, password: args.password }
       const update = { wxId: openid }
-console.log(update)
       const user = await User.findOneAndUpdate(filter, update, { new: true })
       if (!user) {
         throw new UserInputError('wrong credentials')
       }
       return user2token(user)
-    }
+    },
+    favorite: async (root, args, { currentUser }) => {
+      const { type, id } = args.input
+      if (type === 'question') {
+        const savedUser = await User.findByIdAndUpdate(
+          currentUser.id,
+          { $push: { favorite: { questions: id } } },
+          { new: true },
+        )
+        return { user: savedUser }
+      }
+    },
   },
   User: {
     displayName: (parent) => parent.displayName ?? parent.username,
@@ -188,6 +210,9 @@ console.log(update)
       return enrollments.map(enrollment => enrollment.courseEnrolled)
     },
     courseTeache: (parent) => Course.find({ teacher: parent.id }),
+  },
+  Favorite: {
+    questions: (parent) => Post.find({ _id: { $in: parent.questions } }),
   },
 }
 
