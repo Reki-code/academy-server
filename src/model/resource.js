@@ -5,7 +5,7 @@ const schema = new Schema({
   title: String,
   category: {
     type: String,
-    enum: ['video', 'text'],
+    enum: ['video', 'text', 'slides'],
   },
   content: String,
   url: String,
