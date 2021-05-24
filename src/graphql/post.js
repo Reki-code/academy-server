@@ -137,10 +137,9 @@ const resolvers = {
     answerCount: (parent) => Post.find({ '_id': { $in: parent.answers } }).count(),
     vote: (parent) => parent.votes.map(v => v.vote).reduce((acc, cur) => Math.sum(acc, cur), 0),
     isFavorite: (parent, args, { currentUser }) => {
-      const favoriteQuestions = currentUser.toObject().favorite
-        .filter(favor => favor.hasOwnProperty('questions'))
+      const favoriteQuestions = currentUser.toObject().favorite?.questions
       const thisId = parent._id.toString()
-      return favoriteQuestions.some(q => q.questions.toString() === thisId)
+      return favoriteQuestions?.some(q => q.toString() === thisId)
     },
   },
   Vote: {

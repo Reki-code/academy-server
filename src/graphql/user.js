@@ -52,6 +52,7 @@ const typeDef = gql`
       code: String!
     ): Token
     favorite(input: FavoriteInput!): FavoritePayload
+    unFavorite(input: UnFavoriteInput!): UnFavoritePayload
   }
   input CreateUserInput {
     type: Type!
@@ -95,6 +96,13 @@ const typeDef = gql`
     id: String
   }
   type FavoritePayload {
+    user: User
+  }
+  input UnFavoriteInput {
+    type: String!
+    id: String
+  }
+  type UnFavoritePayload {
     user: User
   }
 `
@@ -188,14 +196,13 @@ const resolvers = {
     },
     favorite: async (root, args, { currentUser }) => {
       const { type, id } = args.input
-      if (type === 'question') {
-        const savedUser = await User.findByIdAndUpdate(
-          currentUser.id,
-          { $push: { favorite: { questions: id } } },
-          { new: true },
-        )
-        return { user: savedUser }
-      }
+      const key = `favorite.${type}`
+      const savedUser = await User.findByIdAndUpdate(
+        currentUser.id,
+        { $push: { [key]: id } },
+        { new: true },
+      )
+      return { user: savedUser }
     },
   },
   User: {
