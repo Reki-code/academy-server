@@ -204,6 +204,16 @@ const resolvers = {
       )
       return { user: savedUser }
     },
+    favorite: async (root, args, { currentUser }) => {
+      const { type, id } = args.input
+      const key = `favorite.${type}`
+      const savedUser = await User.findByIdAndUpdate(
+        currentUser.id,
+        { $pull: { [key]: id } },
+        { new: true },
+      )
+      return { user: savedUser }
+    },
   },
   User: {
     displayName: (parent) => parent.displayName ?? parent.username,
