@@ -204,7 +204,7 @@ const resolvers = {
       )
       return { user: savedUser }
     },
-    favorite: async (root, args, { currentUser }) => {
+    unFavorite: async (root, args, { currentUser }) => {
       const { type, id } = args.input
       const key = `favorite.${type}`
       const savedUser = await User.findByIdAndUpdate(
